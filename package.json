@@ -11,6 +11,7 @@
     "@types/node": "^14.14.22",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
+    "@types/react-toast-notifications": "^2.4.0",
     "autoprefixer": "10.x",
     "axios": "^0.21.1",
     "classnames": "^2.2.6",
@@ -23,6 +24,7 @@
     "react-dom": "^17.0.1",
     "react-loader-spinner": "^3.1.14",
     "react-scripts": "4.0.1",
+    "react-toast-notifications": "^2.4.0",
     "tailwindcss": "2.x",
     "typescript": "4.x"
   },
