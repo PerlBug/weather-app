@@ -1,6 +1,5 @@
 # Weather Forecast React App
 
-> This template installs and sets up [Tailwind CSS](https://tailwindcss.com) with TypeScript support.
 
 ## How to run
 
