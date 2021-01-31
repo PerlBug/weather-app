@@ -1,12 +1,13 @@
 # Weather Forecast React App
 
+Displays weather forecast for a given location for the next 4 days.
+The data is fetched from MetaWeather API.
 
 ## How to run
 
 ```bash
 npm install
 ```
-
 
 ```bash
 npm start
