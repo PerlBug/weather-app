@@ -1,13 +1,16 @@
-# cra-template-tailwindcss-typescript
-
-A streamlined [Tailwind CSS](https://tailwindcss.com) template for [Create React App](https://github.com/facebook/create-react-app) in [TypeScript](https://www.typescriptlang.org/).
+# Weather Forecast React App
 
 > This template installs and sets up [Tailwind CSS](https://tailwindcss.com) with TypeScript support.
 
-## Usage
+## How to run
 
 ```bash
-npx create-react-app --template tailwindcss-typescript
+npm install
+```
+
+
+```bash
+npm start
 ```
 
 ## Credits
@@ -19,4 +22,4 @@ This project was made possible thanks to the following projects.
 
 ## License
 
-MIT © [Sung M. Kim](https://sung.codes)
+MIT © [Mko Galoyan]
