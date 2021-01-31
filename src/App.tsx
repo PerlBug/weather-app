@@ -2,8 +2,9 @@ import React from "react";
 import Button from "./components/Button";
 import Input from "./components/Input";
 import Axios from "axios";
-import { IMetaLocation } from "./types/metaWeather";
+import { IMetaForecast, IMetaLocation } from "./types/metaWeather";
 import { useToasts } from "react-toast-notifications";
+import WeatherDisplay from "./components/WeatherDisplay";
 
 function App() {
   const { addToast } = useToasts(); //hook for using react toast
@@ -17,8 +18,12 @@ function App() {
   //this contains the selected city
   const [selectedCity, setSelectedCity] = React.useState<IMetaLocation>({});
 
+  //this holds forecast for selected location
+  const [forecast, setForecast] = React.useState<IMetaForecast[]>([]);
+
   //clears all state
   function clearLocationState() {
+    setForecast([]);
     setLocationResults([]);
     setSelectedCity({});
   }
@@ -51,7 +56,9 @@ function App() {
           `https://cors-anywhere.herokuapp.com/https://www.metaweather.com/api/location/${l.woeid}`
         )
       ).data;
-      console.log(data);
+      if (data?.consolidated_weather?.length) {
+        setForecast(data.consolidated_weather.slice(0, 4));
+      }
     } catch (err) {
       errorToast(err.toString());
       throw err;
@@ -62,7 +69,7 @@ function App() {
   async function fetchLocationData(location: string) {
     try {
       setLoading(true);
-      //we are using CORS Anywhere to bypass the CORS problem for now
+      //we are using CORS Anywhere proxy to bypass the CORS problem for now
       //ideally we would route this through our own API service
       const data: IMetaLocation[] = (
         await Axios.get(
@@ -113,7 +120,7 @@ function App() {
       <div className="mt-3">
         {/* Once the city has been selected, display it here */}
         {selectedCity?.title && (
-          <div>
+          <div className="text-center">
             <h3 className="text-lg">
               Showing forecast for {selectedCity?.title}
             </h3>
@@ -138,6 +145,22 @@ function App() {
             </div>
           </div>
         )}
+        {/* Forecast display */}
+        <div className="flex flex-row mt-6">
+          {forecast.map((f, idx) => (
+            <div>
+              <WeatherDisplay
+                abbr={f.weather_state_abbr}
+                date={f.applicable_date}
+                desc={f.weather_state_name}
+                key={f.id + idx.toString()}
+                maxTemp={Math.round(f.max_temp || 0)}
+                minTemp={Math.round(f.min_temp || 0)}
+                windSpeed={Math.round(f.wind_speed || 0)}
+              />
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
