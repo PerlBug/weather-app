@@ -14,31 +14,57 @@ function App() {
   const [locationResults, setLocationResults] = React.useState<IMetaLocation[]>(
     []
   );
+  //this contains the selected city
+  const [selectedCity, setSelectedCity] = React.useState<IMetaLocation>({});
+
+  //clears all state
+  function clearLocationState() {
+    setLocationResults([]);
+    setSelectedCity({});
+  }
 
   function onLocationChange(e: any) {
-    console.log(e.target.value);
     setLocation(e.target.value);
   }
 
   function handleSubmit() {
+    clearLocationState();
     //if no location, we return and toast error
     if (!location) return errorToast("Please enter a city");
 
-    fetchWeatherData(location);
+    fetchLocationData(location);
   }
 
+  //renders an error toast on the screen
   function errorToast(msg: string) {
     addToast(msg, {
       appearance: "error",
       autoDismiss: true,
     });
   }
-  async function fetchWeatherData(location: string) {
+
+  //fetch forecast data for given location
+  async function fetchWeatherData(l: IMetaLocation) {
+    try {
+      const data: any = (
+        await Axios.get(
+          `https://cors-anywhere.herokuapp.com/https://www.metaweather.com/api/location/${l.woeid}`
+        )
+      ).data;
+      console.log(data);
+    } catch (err) {
+      errorToast(err.toString());
+      throw err;
+    }
+  }
+
+  //will fetch the location data and set it to local state
+  async function fetchLocationData(location: string) {
     try {
       setLoading(true);
       //we are using CORS Anywhere to bypass the CORS problem for now
       //ideally we would route this through our own API service
-      const data = (
+      const data: IMetaLocation[] = (
         await Axios.get(
           `https://cors-anywhere.herokuapp.com/https://www.metaweather.com/api/location/search/?query=${location}`
         )
@@ -48,10 +74,8 @@ function App() {
         errorToast("City not found. Please try again.");
       } else if (data.length === 1) {
         //if there is only 1 city, we set the selected city to this one
-      } else {
-        //otherwise, we set the list of returned cities to the state
+        handleCitySelect(data[0]);
       }
-
       setLoading(false);
       setLocationResults(data);
     } catch (err) {
@@ -59,6 +83,11 @@ function App() {
       errorToast(err.toString());
       throw err;
     }
+  }
+
+  function handleCitySelect(l: IMetaLocation) {
+    setSelectedCity(l);
+    fetchWeatherData(l); //fetch forecast data for this city
   }
 
   return (
@@ -80,6 +109,35 @@ function App() {
         <Button onClick={handleSubmit} loading={loading}>
           Submit
         </Button>
+      </div>
+      <div className="mt-3">
+        {/* Once the city has been selected, display it here */}
+        {selectedCity?.title && (
+          <div>
+            <h3 className="text-lg">
+              Showing forecast for {selectedCity?.title}
+            </h3>
+          </div>
+        )}
+        {/* If more than one city has been found, we ask the user which one they want to select */}
+        {locationResults.length > 1 && !selectedCity?.title && (
+          <div className="flex flex-col items-center">
+            <h3 className="text-lg">
+              More than 1 city was found. Please select desired option.
+            </h3>
+            <div className="mt-5">
+              {locationResults.map((l, idx) => (
+                <div
+                  key={l.woeid}
+                  className="shadow-sm border-white border p-2 m-2 cursor-pointer hover:bg-red-700"
+                  onClick={() => handleCitySelect(l)}
+                >
+                  {l.title} {l.latt_long}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
