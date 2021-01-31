@@ -3,8 +3,11 @@ import Button from "./components/Button";
 import Input from "./components/Input";
 import Axios from "axios";
 import { IMetaLocation } from "./types/metaWeather";
+import { useToasts } from "react-toast-notifications";
 
 function App() {
+  const { addToast } = useToasts(); //hook for using react toast
+
   const [location, setLocation] = React.useState<string>("");
   const [loading, setLoading] = React.useState<boolean>(false);
   //this will hold the data returned from the location search API
@@ -18,10 +21,18 @@ function App() {
   }
 
   function handleSubmit() {
-    if (!location) return alert("Please enter your city");
+    //if no location, we return and toast error
+    if (!location) return errorToast("Please enter a city");
+
     fetchWeatherData(location);
   }
 
+  function errorToast(msg: string) {
+    addToast(msg, {
+      appearance: "error",
+      autoDismiss: true,
+    });
+  }
   async function fetchWeatherData(location: string) {
     try {
       setLoading(true);
@@ -32,10 +43,20 @@ function App() {
           `https://cors-anywhere.herokuapp.com/https://www.metaweather.com/api/location/search/?query=${location}`
         )
       ).data;
+      //if locations returned, display error
+      if (!data || !data.length) {
+        errorToast("City not found. Please try again.");
+      } else if (data.length === 1) {
+        //if there is only 1 city, we set the selected city to this one
+      } else {
+        //otherwise, we set the list of returned cities to the state
+      }
+
       setLoading(false);
       setLocationResults(data);
     } catch (err) {
       setLoading(false);
+      errorToast(err.toString());
       throw err;
     }
   }
