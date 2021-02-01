@@ -17,6 +17,12 @@ npm start
 localhost:3000
 ```
 
+## How to test
+
+```bash
+npm run test
+```
+
 ## Credits
 
 This project was made possible thanks to the following projects.
