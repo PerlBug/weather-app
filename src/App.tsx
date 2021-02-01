@@ -6,6 +6,8 @@ import { IMetaForecast, IMetaLocation } from "./types/metaWeather";
 import { useToasts } from "react-toast-notifications";
 import WeatherDisplay from "./components/WeatherDisplay";
 
+
+
 function App() {
   const { addToast } = useToasts(); //hook for using react toast
 
@@ -21,11 +23,52 @@ function App() {
   //this holds forecast for selected location
   const [forecast, setForecast] = React.useState<IMetaForecast[]>([]);
 
+
+  React.useEffect(()=>{
+    if ("geolocation" in navigator) {
+      getClientLocation();
+    }
+  },[])
+
+  //prompts user to get their coordinates
+  function getClientLocation(){
+    navigator.geolocation.getCurrentPosition(function(position) {
+      if(position?.coords?.latitude){
+        const {latitude, longitude} = position?.coords;
+        fetchLocationWithCoordinates(latitude, longitude);
+      }
+    });
+  }
+
+  async function fetchLocationWithCoordinates(lat: number, lng: number){
+    try {
+      setLoading(true);
+      //we are using CORS Anywhere proxy to bypass the CORS problem for now
+      //ideally we would route this through our own API service
+      const data: IMetaLocation[] = (
+        await Axios.get(
+          `https://cors-anywhere.herokuapp.com/https://www.metaweather.com/api/location/search/?lattlong=${lat},${lng}`
+        )
+      ).data;
+      //if locations returned, display error
+      if(data[0]?.latt_long){
+        handleCitySelect(data[0]);
+      }
+      setLoading(false);
+     // setLocationResults(data);
+    } catch (err) {
+      setLoading(false);
+      errorToast(err.toString());
+      throw err;
+    }
+  }
+
   //clears all state
   function clearLocationState() {
     setForecast([]);
     setLocationResults([]);
     setSelectedCity({});
+    setLoading(false);
   }
 
   function onLocationChange(e: any) {
