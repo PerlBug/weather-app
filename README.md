@@ -4,13 +4,17 @@ Displays weather forecast for a given location for the next 4 days.
 The data is fetched from MetaWeather API.
 
 ## How to run
-
+1. Install dependancies
 ```bash
 npm install
 ```
-
+2. Run development server
 ```bash
 npm start
+```
+3. Webpage should be accessable on:
+```bash
+localhost:3000
 ```
 
 ## Credits
