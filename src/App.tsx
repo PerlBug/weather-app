@@ -5,7 +5,7 @@ import Axios from "axios";
 import { IMetaForecast, IMetaLocation } from "./types/metaWeather";
 import { useToasts } from "react-toast-notifications";
 import WeatherDisplay from "./components/WeatherDisplay";
-
+import ReactLoading from 'react-loading';
 
 
 function App() {
@@ -13,6 +13,7 @@ function App() {
 
   const [location, setLocation] = React.useState<string>("");
   const [loading, setLoading] = React.useState<boolean>(false);
+  const [weatherLoading, setWeatherLoading] = React.useState<boolean>(false);
   //this will hold the data returned from the location search API
   const [locationResults, setLocationResults] = React.useState<IMetaLocation[]>(
     []
@@ -53,6 +54,7 @@ function App() {
       //if locations returned, display error
       if(data[0]?.latt_long){
         handleCitySelect(data[0]);
+
       }
       setLoading(false);
      // setLocationResults(data);
@@ -94,6 +96,7 @@ function App() {
   //fetch forecast data for given location
   async function fetchWeatherData(l: IMetaLocation) {
     try {
+      setWeatherLoading(true);
       const data: any = (
         await Axios.get(
           `https://cors-anywhere.herokuapp.com/https://www.metaweather.com/api/location/${l.woeid}`
@@ -102,7 +105,9 @@ function App() {
       if (data?.consolidated_weather?.length) {
         setForecast(data.consolidated_weather.slice(0, 4));
       }
+      setWeatherLoading(false);
     } catch (err) {
+      setWeatherLoading(false);
       errorToast(err.toString());
       throw err;
     }
@@ -136,6 +141,7 @@ function App() {
   }
 
   function handleCitySelect(l: IMetaLocation) {
+    setLocation(l?.title || '');
     setSelectedCity(l);
     fetchWeatherData(l); //fetch forecast data for this city
   }
@@ -189,6 +195,11 @@ function App() {
           </div>
         )}
         {/* Forecast display */}
+        {weatherLoading &&
+          <div className="flex items-center mt-8 justify-center">
+            <div><ReactLoading type="spin" color="white" height={50} width={50}/></div>
+          </div>
+        }
         <div className="flex flex-row mt-6">
           {forecast.map((f, idx) => (
             <div>

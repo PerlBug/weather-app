@@ -22,7 +22,7 @@
     "postcss-preset-env": "6.x",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
-    "react-loader-spinner": "^3.1.14",
+    "react-loading": "^2.0.3",
     "react-scripts": "4.0.1",
     "react-toast-notifications": "^2.4.0",
     "tailwindcss": "2.x",
